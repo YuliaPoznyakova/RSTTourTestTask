@@ -34,7 +34,7 @@ interface ApiService {
     @GET
     suspend fun getBlogCards(
         @Url url: String
-    ): BlogCards
+    ): Response<BlogCards>
 }
 
 object Api {

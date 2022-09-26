@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha.medium
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.nrp.rsttourtesttask.model.Blog
+import com.nrp.rsttourtesttask.model.BlogCard
 import com.nrp.rsttourtesttask.model.ContentItem
 import com.nrp.rsttourtesttask.network.NetworkImageComponentPicasso
 
@@ -43,7 +46,7 @@ class LiveDataActivity : AppCompatActivity() {
 }
 
 @Composable
-fun LiveDataComponent(blogListLiveData: LiveData<List<ContentItem>>) {
+fun LiveDataComponent(blogListLiveData: LiveData<List<BlogCard>>) {
     val blogList by blogListLiveData.observeAsState(initial = emptyList())
     if (blogList.isEmpty()) {
         LiveDataLoadingComponent()
@@ -54,10 +57,10 @@ fun LiveDataComponent(blogListLiveData: LiveData<List<ContentItem>>) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LiveDataComponentList(blogList: List<ContentItem>) {
+fun LiveDataComponentList(blogList: List<BlogCard>) {
     LazyColumn {
         items(
-            items = blogList, itemContent = { contentItem ->
+            items = blogList, itemContent = { blogCard ->
                 Card(
                     shape = RoundedCornerShape(4.dp),
                     backgroundColor = Color.White,
@@ -65,22 +68,14 @@ fun LiveDataComponentList(blogList: List<ContentItem>) {
                 ) {
                     ListItem(text = {
                         Text(
-                            text = contentItem.title,
+                            text = blogCard.title,
                             style = TextStyle(
                                 fontFamily = FontFamily.Serif, fontSize = 25.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
-                    }, secondaryText = {
-                        Text(
-                            text = "Description: ${contentItem.template}",
-                            style = TextStyle(
-                                fontFamily = FontFamily.Serif, fontSize = 15.sp,
-                                fontWeight = FontWeight.Light, color = Color.DarkGray
-                            )
-                        )
                     }, icon = {
-                        contentItem.url.let { imageUrl ->
+                        blogCard.image.medium.let { imageUrl ->
                             NetworkImageComponentPicasso(
                                 url = imageUrl,
                                 modifier = Modifier.width(60.dp).height(60.dp)
@@ -102,31 +97,3 @@ fun LiveDataLoadingComponent() {
         CircularProgressIndicator(modifier = Modifier.wrapContentWidth(CenterHorizontally))
     }
 }
-
-/*@Composable
-fun LaunchInCompositionComponent(viewModel: BlogViewModel) {
-    val personList = remember { mutableStateListOf<ContentItem>() }
-    LaunchedEffect(Unit) {
-        val list = viewModel.loadMain()
-        personList.addAll(list)
-    }
-    if (personList.isEmpty()) {
-        LiveDataLoadingComponent()
-        return
-    }
-    LiveDataComponentList(personList)
-}*/
-
-/*
-@Preview
-@Composable
-fun LiveDataComponentListPreview() {
-    LiveDataComponentList(getSuperheroList())
-}
-
-@Preview
-@Composable
-fun LiveDataLoadingComponentPreview() {
-    LiveDataLoadingComponent()
-}
-*/
